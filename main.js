@@ -18,15 +18,26 @@ function readFile(filename) {
   });
 }
 
+function buildShader(gl, shaderType, source) {
+  var shader = gl.createShader(gl[shaderType]);
+
+  gl.shaderSource(shader, source);
+  gl.compileShader(shader);
+
+  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+    throw new Error(shaderType + " failed to compile: " +
+                    gl.getShaderInfoLog(shader));
+  }
+}
+
 Promise.all([
   readFile('vertex.glsl'),
   readFile('fragment.glsl')
 ]).then(function(values) {
-  var vertexProgram = values[0];
-  var fragmentProgram = values[1];
+  var vertexShader = buildShader(gl, 'VERTEX_SHADER', values[0]);
+  var fragmentShader = buildShader(gl, 'FRAGMENT_SHADER', values[1]);
 
-  console.log(vertexProgram);
-  console.log(fragmentProgram);
+  console.log("Compiled shaders.");
 }).catch(function(reason) {
-  console.log("Failed to fetch shaders!", reason);
+  console.log("Failed to fetch and compile shaders!", reason);
 });
