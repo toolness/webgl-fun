@@ -72,13 +72,22 @@ function runShaderProgram(gl, program, options) {
   gl.drawArrays(gl.TRIANGLES, 0, floats.length / vertexSize);
 }
 
-function startAnimation(gl, program) {
+function startAnimation(gl, program, fpsEl) {
   var minOffset = -0.75;
   var maxOffset = 1.0;
   var colorOffset = 0;
   var offsetDelta = 0.005;
+  var lastFpsCheckpoint = Date.now();
+  var framesThisSecond = 0;
 
   function animate() {
+    framesThisSecond++;
+    if (Date.now() - lastFpsCheckpoint >= 1000) {
+      fps.textContent = framesThisSecond;
+      lastFpsCheckpoint = Date.now();
+      framesThisSecond = 0;
+    }
+
     colorOffset += offsetDelta;
     if (colorOffset > maxOffset) {
       offsetDelta *= -1;
@@ -98,6 +107,7 @@ function startAnimation(gl, program) {
 }
 
 function main() {
+  var fpsEl = document.getElementById('fps');
   var canvas = document.getElementById("main");
   var gl = canvas.getContext("webgl") ||
            canvas.getContext('experimental-webgl');
@@ -124,7 +134,7 @@ function main() {
     console.log("Linked shader program.");
 
     gl.useProgram(program);
-    startAnimation(gl, program);
+    startAnimation(gl, program, fpsEl);
   }).catch(function(reason) {
     console.log("Failed to fetch and compile shaders!", reason);
   });
