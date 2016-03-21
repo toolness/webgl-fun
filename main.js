@@ -29,6 +29,35 @@ function buildShader(gl, shaderType, source) {
   return shader;
 }
 
+function getAttribLocation(gl, program, name) {
+  var location = gl.getAttribLocation(program, name);
+
+  if (location === -1)
+    throw new Error('program attribute not found: ' + name);
+
+  return location;
+}
+
+function runShaderProgram(gl, program) {
+  var positionLoc = getAttribLocation(gl, program, 'a_position');
+  var buffer = gl.createBuffer();
+  var vertexSize = 2;
+  var floats = new Float32Array([
+    -1.0, -1.0,
+     1.0, -1.0,
+    -1.0,  1.0,
+    -1.0,  1.0,
+     1.0, -1.0,
+     1.0,  1.0
+  ]);
+
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, floats, gl.STATIC_DRAW);
+  gl.enableVertexAttribArray(positionLoc);
+  gl.vertexAttribPointer(positionLoc, vertexSize, gl.FLOAT, false, 0, 0);
+  gl.drawArrays(gl.TRIANGLES, 0, floats.length / vertexSize);
+}
+
 function main() {
   var canvas = document.getElementById("main");
   var gl = canvas.getContext("webgl");
@@ -53,6 +82,9 @@ function main() {
     }
 
     console.log("Linked shader program.");
+
+    gl.useProgram(program);
+    runShaderProgram(gl, program);
   }).catch(function(reason) {
     console.log("Failed to fetch and compile shaders!", reason);
   });
