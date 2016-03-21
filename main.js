@@ -1,6 +1,3 @@
-var canvas = document.getElementById("main");
-var gl = canvas.getContext("webgl");
-
 function readFile(filename) {
   var req = new XMLHttpRequest();
 
@@ -32,26 +29,33 @@ function buildShader(gl, shaderType, source) {
   return shader;
 }
 
-Promise.all([
-  readFile('vertex.glsl'),
-  readFile('fragment.glsl')
-]).then(function(values) {
-  var program = gl.createProgram();
-  var vertexShader = buildShader(gl, 'VERTEX_SHADER', values[0]);
-  var fragmentShader = buildShader(gl, 'FRAGMENT_SHADER', values[1]);
+function main() {
+  var canvas = document.getElementById("main");
+  var gl = canvas.getContext("webgl");
 
-  console.log("Compiled shaders.");
+  Promise.all([
+    readFile('vertex.glsl'),
+    readFile('fragment.glsl')
+  ]).then(function(values) {
+    var program = gl.createProgram();
+    var vertexShader = buildShader(gl, 'VERTEX_SHADER', values[0]);
+    var fragmentShader = buildShader(gl, 'FRAGMENT_SHADER', values[1]);
 
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
+    console.log("Compiled shaders.");
 
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    throw new Error("Failed to link shader program: " +
-                    gl.getProgramInfoLog(program));
-  }
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
 
-  console.log("Linked shader program.");
-}).catch(function(reason) {
-  console.log("Failed to fetch and compile shaders!", reason);
-});
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+      throw new Error("Failed to link shader program: " +
+                      gl.getProgramInfoLog(program));
+    }
+
+    console.log("Linked shader program.");
+  }).catch(function(reason) {
+    console.log("Failed to fetch and compile shaders!", reason);
+  });
+}
+
+onload = main;
