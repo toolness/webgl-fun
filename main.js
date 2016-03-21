@@ -99,7 +99,8 @@ function startAnimation(gl, program) {
 
 function main() {
   var canvas = document.getElementById("main");
-  var gl = canvas.getContext("webgl");
+  var gl = canvas.getContext("webgl") ||
+           canvas.getContext('experimental-webgl');
 
   Promise.all([
     readFile('vertex.glsl'),
