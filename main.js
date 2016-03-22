@@ -146,7 +146,7 @@ function main() {
   Promise.all([
     readFile('vertex.glsl'),
     readFile('fragment.glsl'),
-    loadImage('cc.large.png')
+    loadImage('kare-bomb.png')
   ]).then(function(values) {
     var program = gl.createProgram();
     var vertexShader = buildShader(gl, 'VERTEX_SHADER', values[0]);
