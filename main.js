@@ -1,3 +1,18 @@
+function loadImage(filename) {
+  return new Promise(function(resolve, reject) {
+    var img = document.createElement('img');
+
+    img.onload = function() {
+      resolve(img);
+    };
+    img.onerror = function() {
+      reject(new Error("image " + filename + " failed to load"));
+    };
+
+    img.setAttribute('src', filename);
+  });
+}
+
 function readFile(filename) {
   var req = new XMLHttpRequest();
 
@@ -114,11 +129,13 @@ function main() {
 
   Promise.all([
     readFile('vertex.glsl'),
-    readFile('fragment.glsl')
+    readFile('fragment.glsl'),
+    loadImage('cc.large.png')
   ]).then(function(values) {
     var program = gl.createProgram();
     var vertexShader = buildShader(gl, 'VERTEX_SHADER', values[0]);
     var fragmentShader = buildShader(gl, 'FRAGMENT_SHADER', values[1]);
+    var image = values[2];
 
     console.log("Compiled shaders.");
 
@@ -136,7 +153,7 @@ function main() {
     gl.useProgram(program);
     startAnimation(gl, program, fpsEl);
   }).catch(function(reason) {
-    console.log("Failed to fetch and compile shaders!", reason);
+    console.log("Failed to fetch and compile resources!", reason);
   });
 }
 
