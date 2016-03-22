@@ -62,6 +62,22 @@ function getAttribLocation(gl, program, name) {
   return location;
 }
 
+function loadTexture(gl, program, image) {
+  var texture = gl.createTexture();
+  var textureUnitIndex = 0;
+
+  gl.activeTexture(gl.TEXTURE0 + textureUnitIndex);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.uniform1i(getUniformLocation(gl, program, 'u_image'), textureUnitIndex);
+
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+}
+
 function runShaderProgram(gl, program, options) {
   options = options || {};
 
@@ -151,6 +167,7 @@ function main() {
     console.log("Linked shader program.");
 
     gl.useProgram(program);
+    loadTexture(gl, program, image);
     startAnimation(gl, program, fpsEl);
   }).catch(function(reason) {
     console.log("Failed to fetch and compile resources!", reason);
